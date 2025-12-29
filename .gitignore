@@ -1,0 +1,31 @@
+# ==========================================
+# 1. IGNORE DEPENDENCIES (Frontend & Backend)
+# ==========================================
+# This ignores node_modules in ANY folder
+**/node_modules/
+package-lock.json
+
+
+# ==========================================
+# 2. IGNORE SECRETS (Frontend & Backend)
+# ==========================================
+# This ignores .env files in ANY folder
+**/.env
+**/.env.local
+**/.env.production
+
+
+# ==========================================
+# 3. FRONTEND SPECIFIC (Next.js Build Files)
+# ==========================================
+devops-tier3-frontend/.next/
+devops-tier3-frontend/out/
+devops-tier3-frontend/build/
+
+
+# ==========================================
+# 4. SYSTEM JUNK (Optional but recommended)
+# ==========================================
+.DS_Store
+Thumbs.db
+*.log
