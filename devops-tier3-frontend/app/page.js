@@ -115,7 +115,7 @@ export default function Home() {
 
             <button 
               disabled={loading}
-              className="mt-4 w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded transition"
+              className="mt-4  w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded transition"
             >
               {loading ? 'Saving...' : 'Add to Database'}
             </button>
