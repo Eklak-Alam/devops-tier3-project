@@ -1,36 +1,37 @@
 # ----------------------------
 # STAGE 1: Build the App
 # ----------------------------
-FROM node:18-alpine AS builder
-
+FROM node:20-alpine AS builder
 WORKDIR /app
 
-# Copy deps
+# Install dependencies
 COPY package*.json ./
 RUN npm install
 
-# Copy source and build
+# Build the project
 COPY . .
 RUN npm run build
 
 # ----------------------------
-# STAGE 2: Run the App (Production)
+# STAGE 2: Run the App (Ultra-Light)
 # ----------------------------
-FROM node:18-alpine AS runner
-
+FROM node:20-alpine AS runner
 WORKDIR /app
 
-# Set env to production for speed
 ENV NODE_ENV=production
+ENV PORT=3000
 
-# Copy only necessary files from the builder stage
-COPY --from=builder /app/package*.json ./
-COPY --from=builder /app/.next ./.next
+# 1. Copy Public folder (Images, Icons)
 COPY --from=builder /app/public ./public
-COPY --from=builder /app/node_modules ./node_modules
 
-# Expose port 3000
+# 2. Copy the "Standalone" build (Tiny size!)
+# This automatically includes only the necessary node_modules
+COPY --from=builder /app/.next/standalone ./
+
+# 3. Copy Static assets (CSS/JS chunks)
+COPY --from=builder /app/.next/static ./.next/static
+
 EXPOSE 3000
 
-# Start Next.js
-CMD ["npm", "start"]
+# Start using 'node' directly (Lighter than npm)
+CMD ["node", "server.js"]
