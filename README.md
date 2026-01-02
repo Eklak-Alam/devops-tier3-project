@@ -1,11 +1,6 @@
-# 🚀 DevOps Tier 3 Web Application
+# 🚀 Full-Stack DevOps Three-Tier Application
 
-A full-stack **Tier 3 Architecture** application built to demonstrate modern DevOps practices, microservices communication, automated database management, and Containerization.
-
-![Project Status](https://img.shields.io/badge/Status-Active-brightgreen)
-![Stack](https://img.shields.io/badge/Stack-MERN%20%2B%20MySQL-blue)
-![Docker](https://img.shields.io/badge/Docker-Ready-2496ED)
-![AWS](https://img.shields.io/badge/AWS-EC2-orange)
+A **production-ready three-tier architecture** application built using **Next.js**, **Node.js**, **MySQL**, **Docker**, **GitHub Actions**, and **AWS EC2** with a complete **CI/CD pipeline**.
 
 ---
 
@@ -15,87 +10,93 @@ A full-stack **Tier 3 Architecture** application built to demonstrate modern Dev
 - [Project Structure](#-project-structure)
 - [Prerequisites](#-prerequisites)
 - [Getting Started](#-getting-started)
-- [Docker Hub Repositories](#-docker-hub-repositories)
-- [Roadmap](#-roadmap)
-- [Author](#-author)
+- [Docker Configuration](#-docker-configuration)
+- [GitHub Actions CI/CD](#-github-actions-cicd)
+- [Production Deployment](#-production-deployment)
+- [API Documentation](#-api-documentation)
+- [Troubleshooting](#-troubleshooting)
+- [License](#-license)
 
 ---
 
 ## 🏗 Architecture
 
-The application follows a strict separation of concerns, deployed using **Docker Containers**:
-
-* **Tier 1 (Presentation):** Next.js (Frontend) running on Port `3000`.
-* **Tier 2 (Logic):** Node.js + Express (Backend API) running on Port `5000`.
-* **Tier 3 (Data):** MySQL (Database) running securely on Port `3306` (Internal Network).
+### 🔹 Three-Tier Architecture Overview
 
 ```mermaid
-flowchart LR
-    subgraph Client ["Tier 1: Client Side"]
-        Browser[User Browser]
+graph TB
+    subgraph "Tier 1: Presentation Layer"
+        F[Frontend<br/>Next.js :3000]
     end
-
-    subgraph Server ["Tier 2: Application Server"]
-        NextJS[Next.js Frontend] 
-        NodeAPI[Node.js Backend API]
-    end
-
-    subgraph Data ["Tier 3: Database"]
-        MySQL[(MySQL Database)]
-    end
-
-    Browser -- "Requests UI (:3000)" --> NextJS
-    NextJS -- "Fetch Data (JSON)" --> NodeAPI
-    NodeAPI -- "SQL Queries (:3306)" --> MySQL
     
-    style NextJS fill:#000000,stroke:#fff,stroke-width:2px,color:#fff
-    style NodeAPI fill:#68a063,stroke:#333,stroke-width:2px,color:#fff
-    style MySQL fill:#00758f,stroke:#333,stroke-width:2px,color:#fff
-
-
-    graph LR
-    Dev(Developer) -- "git push" --> GitHub
-    GitHub -- "Action Trigger" --> DockerHub
-    DockerHub -- "Pull Image" --> EC2[AWS EC2 Instance]
-    EC2 -- "docker compose up" --> LiveApp
-    
-    subgraph "AWS Production Environment"
-        LiveApp --> Frontend
-        LiveApp --> Backend
-        LiveApp --> Database
+    subgraph "Tier 2: Application Layer"
+        B[Backend API<br/>Node.js :5000]
     end
-
     
-🚀 Getting Started (Run Locally)
-Follow these steps to get the app running on your machine in under 5 minutes.
+    subgraph "Tier 3: Data Layer"
+        D[(MySQL Database<br/>:3306)]
+    end
+    
+    User[👤 User] -->|HTTP| F
+    F -->|REST API| B
+    B -->|SQL Queries| D
+
+    style F fill:#000,color:#fff
+    style B fill:#68a063,color:#fff
+    style D fill:#00758f,color:#fff
+```
+
+graph LR
+    A[👨‍💻 Developer] -->|git push| B[GitHub]
+    B -->|Triggers| C[GitHub Actions]
+    C -->|Build & Test| D[Docker Images]
+    D -->|Push to| E[Docker Hub]
+    E -->|Pull & Deploy| F[AWS EC2]
+    F -->|docker compose| G[🚀 Production]
+
+    style E fill:#2496ED,color:#fff
+    style F fill:#FF9900,color:#000
 
 
-
-    ├── frontend/           # Next.js Application (Tier 1)
-│   ├── Dockerfile     # Multi-stage build for React
-│   └── src/
-├── backend/            # Node.js Express API (Tier 2)
-│   ├── Dockerfile     # Optimized Node image
-│   └── server.js
-├── database/           # Database Configuration (Tier 3)
-│   └── init.sql       # Initial schema setup
-├── docker-compose.yml  # Orchestration for all services
+devops-tier3-app/
+├── .github/
+│   └── workflows/
+│       └── ci-cd.yml
+├── frontend/
+│   ├── public/
+│   ├── src/
+│   │   ├── app/
+│   │   ├── components/
+│   │   └── styles/
+│   ├── package.json
+│   ├── next.config.js
+│   ├── .env.local
+│   ├── Dockerfile
+│   └── .dockerignore
+├── backend/
+│   ├── src/
+│   │   ├── controllers/
+│   │   ├── routes/
+│   │   ├── models/
+│   │   └── config/
+│   ├── package.json
+│   ├── server.js
+│   ├── .env
+│   ├── Dockerfile
+│   └── .dockerignore
+├── database/
+│   ├── init.sql
+│   └── Dockerfile
+├── docker-compose.yml
+├── docker-compose.prod.yml
+├── .env.example
+├── .gitignore
 └── README.md
 
 
-git clone [https://github.com/eklakalam/devops-tier3-app.git](https://github.com/eklakalam/devops-tier3-app.git)
+git clone https://github.com/your-username/devops-tier3-app.git
 cd devops-tier3-app
 
-Create a .env file in the root directory. This keeps your secrets safe.
-
-# .env
-MYSQL_ROOT_PASSWORD=secretpassword
-MYSQL_DATABASE=myappdb
-MYSQL_USER=user
-MYSQL_PASSWORD=userpassword
-DB_HOST=database
-
-3. Spin Up Containers
-Use Docker Compose to build and start the entire stack.
-
-docker compose up -d --build
+docker compose up -d
+docker compose down
+docker ps
