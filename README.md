@@ -52,7 +52,6 @@ flowchart LR
     style NextJS fill:#000000,stroke:#fff,stroke-width:2px,color:#fff
     style NodeAPI fill:#68a063,stroke:#333,stroke-width:2px,color:#fff
     style MySQL fill:#00758f,stroke:#333,stroke-width:2px,color:#fff
-```
 
     graph TD
     Dev[Developer] -->|git push| GitHub
