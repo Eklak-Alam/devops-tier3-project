@@ -1,0 +1,18 @@
+name: My First Workflow
+
+# 1. Trigger: When should this run?
+on: [push] 
+
+# 2. Jobs: What should it do?
+jobs:
+  say-hello:
+    runs-on: ubuntu-latest  # This is a VM provided by GitHub
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3 # This downloads your code to the VM
+
+      - name: Say Hello
+        run: echo "Hello! I am your GitHub Action robot. I see you pushed code!"
+
+      - name: Check Files
+        run: ls -la # List files to prove we have your code
