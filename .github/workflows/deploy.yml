@@ -97,6 +97,15 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
             cd /home/ubuntu/
+            
+            # 1. STOP the running containers first (Release RAM)
+            sudo docker compose down
+            
+            # 2. Pull the new images (Now it won't crash)
             sudo docker compose pull
+            
+            # 3. Start everything back up in the background
             sudo docker compose up -d
+            
+            # 4. Clean up old unused images to save disk space
             sudo docker image prune -f
