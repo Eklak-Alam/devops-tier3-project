@@ -1,102 +1,67 @@
-# 🚀 Full-Stack DevOps Three-Tier Application
+# 🚀 DevOps Tier 3 Web Application
 
-A **production-ready three-tier architecture** application built using **Next.js**, **Node.js**, **MySQL**, **Docker**, **GitHub Actions**, and **AWS EC2** with a complete **CI/CD pipeline**.
+> A production-ready **3-Tier Architecture** demonstrating modern DevOps practices: Microservices, Containerization, CI/CD Pipelines, and Cloud Deployment.
+
+![Status](https://img.shields.io/badge/Status-Live-brightgreen?style=for-the-badge)
+![Tech Stack](https://img.shields.io/badge/Stack-Next.js%20%7C%20Node%20%7C%20MySQL-blue?style=for-the-badge)
+![Docker](https://img.shields.io/badge/Docker-Containerized-2496ED?style=for-the-badge&logo=docker)
+![CI/CD](https://img.shields.io/badge/GitHub_Actions-Automated-2088FF?style=for-the-badge&logo=github-actions)
+![AWS](https://img.shields.io/badge/AWS-EC2_Deployed-FF9900?style=for-the-badge&logo=amazon-aws)
 
 ---
 
 ## 📖 Table of Contents
-- [Architecture](#-architecture)
-- [Deployment Pipeline](#-deployment-pipeline)
-- [Project Structure](#-project-structure)
-- [Prerequisites](#-prerequisites)
-- [Getting Started](#-getting-started)
-- [Docker Configuration](#-docker-configuration)
-- [GitHub Actions CI/CD](#-github-actions-cicd)
-- [Production Deployment](#-production-deployment)
-- [API Documentation](#-api-documentation)
-- [Troubleshooting](#-troubleshooting)
-- [License](#-license)
+- [🏗 System Architecture](#-system-architecture)
+- [🔄 CI/CD Pipeline & Workflow](#-cicd-pipeline--workflow)
+- [📂 Project Structure](#-project-structure)
+- [🚀 Getting Started (Local)](#-getting-started-local)
+- [☁️ Deployment Guide (AWS EC2)](#-deployment-guide-aws-ec2)
+- [🐋 Docker Hub Repositories](#-docker-hub-repositories)
+- [🛠 Troubleshooting](#-troubleshooting)
 
 ---
 
-## 🏗 Architecture
+## 🏗 System Architecture
 
-### 🔹 Three-Tier Architecture Overview
+This project strictly follows the **Three-Tier Architecture** pattern to ensure separation of concerns, scalability, and security.
+
+### **The 3 Layers:**
+1.  **Presentation Tier (Frontend):** Next.js Application running on Port `3000`.
+2.  **Logic Tier (Backend):** Node.js + Express API running on Port `5000`.
+3.  **Data Tier (Database):** MySQL Database running on Port `3306` (Internal Network only).
 
 ```mermaid
-graph TB
-    subgraph "Tier 1: Presentation Layer"
-        F[Frontend<br/>Next.js :3000]
+flowchart LR
+    subgraph User_Space ["Tier 1: Client"]
+        Browser[User Browser]
     end
-    
-    subgraph "Tier 2: Application Layer"
-        B[Backend API<br/>Node.js :5000]
-    end
-    
-    subgraph "Tier 3: Data Layer"
-        D[(MySQL Database<br/>:3306)]
-    end
-    
-    User[👤 User] -->|HTTP| F
-    F -->|REST API| B
-    B -->|SQL Queries| D
 
-    style F fill:#000,color:#fff
-    style B fill:#68a063,color:#fff
-    style D fill:#00758f,color:#fff
+    subgraph App_Server ["Tier 2: Application Logic"]
+        NextJS[Next.js Frontend\n(Port 3000)] 
+        NodeAPI[Node.js Backend\n(Port 5000)]
+    end
+
+    subgraph Data_Layer ["Tier 3: Database"]
+        MySQL[(MySQL Database\nInternal: 3306)]
+    end
+
+    Browser -- "HTTP Request" --> NextJS
+    NextJS -- "REST API Call" --> NodeAPI
+    NodeAPI -- "SQL Query" --> MySQL
+    
+    style NextJS fill:#000000,stroke:#fff,stroke-width:2px,color:#fff
+    style NodeAPI fill:#68a063,stroke:#333,stroke-width:2px,color:#fff
+    style MySQL fill:#00758f,stroke:#333,stroke-width:2px,color:#fff
 ```
 
-graph LR
-    A[👨‍💻 Developer] -->|git push| B[GitHub]
-    B -->|Triggers| C[GitHub Actions]
-    C -->|Build & Test| D[Docker Images]
-    D -->|Push to| E[Docker Hub]
-    E -->|Pull & Deploy| F[AWS EC2]
-    F -->|docker compose| G[🚀 Production]
-
-    style E fill:#2496ED,color:#fff
-    style F fill:#FF9900,color:#000
-
-
-devops-tier3-app/
-├── .github/
-│   └── workflows/
-│       └── ci-cd.yml
-├── frontend/
-│   ├── public/
-│   ├── src/
-│   │   ├── app/
-│   │   ├── components/
-│   │   └── styles/
-│   ├── package.json
-│   ├── next.config.js
-│   ├── .env.local
-│   ├── Dockerfile
-│   └── .dockerignore
-├── backend/
-│   ├── src/
-│   │   ├── controllers/
-│   │   ├── routes/
-│   │   ├── models/
-│   │   └── config/
-│   ├── package.json
-│   ├── server.js
-│   ├── .env
-│   ├── Dockerfile
-│   └── .dockerignore
-├── database/
-│   ├── init.sql
-│   └── Dockerfile
-├── docker-compose.yml
-├── docker-compose.prod.yml
-├── .env.example
-├── .gitignore
-└── README.md
-
-
-git clone https://github.com/your-username/devops-tier3-app.git
-cd devops-tier3-app
-
-docker compose up -d
-docker compose down
-docker ps
+    graph TD
+    Dev[Developer] -->|git push| GitHub
+    
+    subgraph "GitHub Actions (CI/CD)"
+        direction TB
+        Test[🧪 Phase 1: Sanity Checks] -->|Pass| Build[🐳 Phase 2: Build Images]
+        Build -->|Success| Push[🚀 Phase 3: Push to DockerHub]
+    end
+    
+    Push --> DockerHub
+    DockerHub -->|Pull| AWS[AWS EC2 Production]
