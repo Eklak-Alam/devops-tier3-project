@@ -5,11 +5,12 @@ services:
   frontend:
     image: eklakalam/devops-tier3-frontend:latest
     container_name: production-frontend
-    restart: always  # If it crashes, restart it
+    restart: always
     ports:
       - "3000:3000"
     environment:
-      - REACT_APP_API_URL=http://<YOUR-EC2-IP>:5000 # Point frontend to backend
+      # Next.js specific variable
+      - NEXT_PUBLIC_API_URL=http://13.203.200.9:5000
     depends_on:
       - backend
     networks:
@@ -21,15 +22,15 @@ services:
     container_name: production-backend
     restart: always
     ports:
-      - "5000:5000" # Exposed so your Frontend can reach the API
+      - "5000:5000"
     environment:
-      - DB_HOST=database
+      - DB_HOST=database   # Must match the service name below
       - DB_USER=root
-      - DB_PASSWORD=${MYSQL_ROOT_PASSWORD} # Reads from .env
+      - DB_PASS=${MYSQL_ROOT_PASSWORD} # Matches your Node code (process.env.DB_PASS)
       - DB_NAME=${MYSQL_DATABASE}
     depends_on:
       database:
-        condition: service_healthy # Wait until DB is ACTUALLY ready
+        condition: service_healthy
     networks:
       - app-network
 
@@ -38,8 +39,6 @@ services:
     image: mysql:8.0
     container_name: production-db
     restart: always
-    # NOTICE: No 'ports' section here. 
-    # The DB is hidden inside the docker network for security.
     environment:
       - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
       - MYSQL_DATABASE=${MYSQL_DATABASE}
@@ -47,7 +46,6 @@ services:
       - db_data:/var/lib/mysql
     networks:
       - app-network
-    # Healthcheck ensures DB is ready before Backend starts
     healthcheck:
       test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
       timeout: 20s
