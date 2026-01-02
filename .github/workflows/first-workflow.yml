@@ -8,13 +8,12 @@ on:
 
 jobs:
   # ------------------------------------
-  # JOB 1: Test the Frontend (Next.js)
+  # JOB 1: Test the Frontend
   # ------------------------------------
   frontend-check:
     runs-on: ubuntu-latest
     defaults:
       run:
-        # ⚠️ IMPORTANT: Verify this matches your ACTUAL frontend folder name
         working-directory: ./devops-tier3-frontend
 
     steps:
@@ -25,33 +24,28 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: '20'
-          cache: 'npm'
-          cache-dependency-path: ./devops-tier3-frontend/package-lock.json
+          # Removed cache lines to stop the error
 
       - name: Install Dependencies
-        # 'npm ci' is faster/cleaner for servers than 'npm install'
-        run: npm ci
+        # Using 'npm install' instead of 'npm ci' so it works even without a lockfile
+        run: npm install
 
       - name: Run Linter
-        # Checks for code style errors (defined in your package.json)
         run: npm run lint
 
       - name: Check Build
-        # This compiles the Next.js app. If this passes, your code is good.
         run: npm run build
         env:
-          # We provide a dummy URL just so the build doesn't crash on missing ENV variables
           NEXT_PUBLIC_API_URL: "http://localhost:5000"
 
   # ------------------------------------
-  # JOB 2: Test the Backend (Node/Express)
+  # JOB 2: Test the Backend
   # ------------------------------------
   backend-check:
     runs-on: ubuntu-latest
     defaults:
       run:
-        # ⚠️ IMPORTANT: Verify this matches your ACTUAL backend folder name
-        # If your folder is named "devops-tier3-backend", change "backend" to that.
+        # UPDATED: Changed from 'backend' to 'devops-tier3-backend'
         working-directory: ./devops-tier3-backend
 
     steps:
@@ -62,13 +56,9 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: '20'
-          cache: 'npm'
-          # Update this path if your backend folder name is different
-          cache-dependency-path: ./backend/package-lock.json
 
       - name: Install Dependencies
-        run: npm ci
+        run: npm install
 
       - name: Syntax Check
-        # Since you don't have tests yet, we just check if the main file loads without crashing
         run: node -c index.js
