@@ -13,7 +13,7 @@ export default function Home() {
   // --- CONFIG ---
   // 1. Remove "/users" from here. Just the server address.
   // 2. Use the Public IP of your EC2 instance.
-  const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://13.203.200.9:5000";
+  const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://65.1.148.175:5000";
 
   // --- FUNCTIONS ---
 
