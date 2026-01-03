@@ -1,4 +1,5 @@
 Project Documentation: DevOps Tier-3 Web Application
+
 1. Project Overview
 This project is a full-stack 3-Tier Web Application designed to demonstrate modern DevOps practices. It transitions a traditional web app into a fully containerized, automated, and cloud-hosted solution. The application allows users to create, view, and delete user data, simulating real-world CRUD operations.
 
