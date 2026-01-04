@@ -10,7 +10,7 @@ services:
       - "3000:3000"
     environment:
       # Next.js specific variable
-      - NEXT_PUBLIC_API_URL=http://65.1.148.175:5000
+      - NEXT_PUBLIC_API_URL=http://13.201.73.113:5000
     depends_on:
       - backend
     networks:
