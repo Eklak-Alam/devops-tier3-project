@@ -1,112 +1,60 @@
 # 🚀 DevOps Tier-3 Web Application (Jenkins + Docker + AWS)
-  
+
 ![Jenkins](https://img.shields.io/badge/Jenkins-D24939?style=for-the-badge&logo=jenkins&logoColor=white)
 ![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)
 ![AWS](https://img.shields.io/badge/AWS-232F3E?style=for-the-badge&logo=amazon-aws&logoColor=white)
 ![Next JS](https://img.shields.io/badge/Next-black?style=for-the-badge&logo=next.js&logoColor=white)
 ![NodeJS](https://img.shields.io/badge/Node.js-43853D?style=for-the-badge&logo=node.js&logoColor=white)
+![MySQL](https://img.shields.io/badge/MySQL-00000F?style=for-the-badge&logo=mysql&logoColor=white)
 
-## 1. Project Overview
-This project is an enterprise-grade **3-Tier Web Application** that demonstrates the complete DevOps lifecycle. It transitions a traditional web app into a fully containerized, automated, and cloud-hosted solution using a self-hosted **Jenkins CI/CD pipeline**.
+## 📋 Project Overview
 
-The goal was to simulate a real-world production environment where code changes committed to **GitHub** automatically trigger a pipeline that builds Docker images, pushes them to a registry, and updates a live **AWS EC2** server without human intervention.
+This project simulates a real-world, enterprise-grade **DevOps Lifecycle**. It transforms a traditional 3-Tier Web Application into a fully containerized, automated, and cloud-hosted solution using a self-hosted **Jenkins CI/CD pipeline**.
 
----
-
-## 2. Technical Architecture
-The application follows a microservices architecture pattern with strict isolation between layers.
-
-### 🔹 Tier 1: The Frontend (Presentation)
-- **Tech:** Next.js (React).
-- **Role:** User Interface for CRUD operations.
-- **Networking:** Configured dynamically during the Docker build process to point to the **Backend API's Public IP** (AWS EC2), ensuring users across the internet can connect.
-
-### 🔹 Tier 2: The Backend (Logic)
-- **Tech:** Node.js (Express).
-- **Role:** API Gateway. Validates requests and communicates with the database.
-- **Networking:** Runs in a secure Docker network. Connects to the database using the internal service hostname `database`, ensuring isolation.
-
-### 🔹 Tier 3: The Database (Storage)
-- **Tech:** MySQL 8.0.
-- **Role:** Persistent data storage.
-- **Security:** Completely isolated. No public ports are open; only the Backend container can access it via the Docker network.
+**The Goal:** Eliminate manual deployment. Any code committed to **GitHub** automatically triggers a pipeline that builds Docker images, pushes them to a registry, and updates a live **AWS EC2** production server without human intervention.
 
 ---
 
-## 3. DevOps Infrastructure
-We evolved from cloud-based CI to a robust, self-hosted infrastructure.
+## 🏗️ Technical Architecture
 
-| Component | Description |
-| :--- | :--- |
-| **Jenkins Master** | A dedicated EC2 instance running Jenkins (Java 17) and Docker. It acts as the "Command Center." |
-| **App Server** | The live Production EC2 instance hosting the 3-Tier application containers. |
-| **Docker Hub** | Used as the Container Registry to store versioned images. |
-| **Security** | SSH Keys (`.pem`) and credentials managed securely via Jenkins Credential Store. |
+The application follows a strict microservices architecture with isolated networking.
 
----
-
-## 4. The Jenkins CI/CD Pipeline
-I implemented a **Declarative Pipeline** (`Jenkinsfile`) that executes automatically via GitHub Webhooks.
-
-### ⚙️ Stage 1: Checkout SCM
-Jenkins pulls the latest code from the GitHub repository (`main` branch) to its local workspace.
-
-### ⚙️ Stage 2: Build & Push (Docker)
-Jenkins acts as the build server:
-1.  **Backend Build:** Builds the Node.js image and pushes it to Docker Hub.
-2.  **Frontend Build (Dynamic Injection):** Jenkins injects the **EC2 Public IP** (`NEXT_PUBLIC_API_URL`) as a build argument. This "bakes" the API address into the static React files.
-
-### ⚙️ Stage 3: Deploy to Production
-Jenkins connects to the **App Server** via SSH to deploy updates:
-1.  **File Transfer (`scp`):** Copies the `docker-compose.yml` configuration to the server.
-2.  **Remote Execution (`ssh`):** Runs the deployment commands:
-    ```bash
-    sudo docker-compose down
-    sudo docker-compose pull
-    sudo docker-compose up -d
-    sudo docker image prune -f
-    ```
+| Tier | Component | Technology | Description |
+| :--- | :--- | :--- | :--- |
+| **1** | **Frontend** | Next.js (React) | User Interface. Connects to the Backend via a dynamic Public IP injected during build time. |
+| **2** | **Backend** | Node.js (Express) | API Gateway. Validates requests and securely communicates with the database. |
+| **3** | **Database** | MySQL 8.0 | Persistent storage. Isolated in a private Docker network (no public access). |
 
 ---
 
-## 5. Challenges & Solutions
-Real-world engineering problems solved during development.
+## ⚙️ The DevOps Infrastructure
 
-### ❌ Challenge 1: The "Missing Script" Crash
-* **Issue:** Backend container started and immediately crashed.
-* **Diagnosis:** `npm error: Missing script: "start"`. The `package.json` was missing the start command.
-* **Solution:** Updated `package.json` to include `"start": "node index.js"`.
+We moved away from managed services to build a robust, self-hosted infrastructure on AWS.
 
-### ❌ Challenge 2: Docker Command Mismatch
-* **Issue:** Deployment failed with `docker: unknown command: docker compose`.
-* **Diagnosis:** The App Server had an older Docker version requiring the hyphenated command.
-* **Solution:** Updated Jenkins Pipeline to use `docker-compose` instead of `docker compose`.
-
-### ❌ Challenge 3: Frontend "Connection Timed Out"
-* **Issue:** Frontend loaded but couldn't fetch data (tried connecting to an old IP).
-* **Diagnosis:** `Dockerfile` didn't accept build arguments, so the new IP wasn't baked in.
-* **Solution:** Added `ARG NEXT_PUBLIC_API_URL` to the Dockerfile and updated Jenkins to pass the variable during build.
-
-### ❌ Challenge 4: Configuration Drift
-* **Issue:** App Server complained `Can't find configuration file`.
-* **Solution:** Added an `scp` step in Jenkins to transfer `docker-compose.yml` before deployment.
+- **Build Server (Jenkins Master):** An EC2 instance running Jenkins & Docker. It acts as the "Command Center" using a `Jenkinsfile` for pipeline orchestration.
+- **Production Server (App Server):** A separate EC2 instance hosting the live application containers.
+- **Container Registry:** Docker Hub is used to store versioned images of the Frontend and Backend.
 
 ---
 
-## 6. How to Run & Verify
+## 🔄 CI/CD Pipeline Workflow (Pipeline as Code)
 
-### 1️⃣ The Automation
-1.  Push a change to GitHub.
-2.  Jenkins triggers automatically via **Webhook**.
-3.  Pipeline stages turn Green: **Checkout** ✅ → **Build** ✅ → **Deploy** ✅.
+I implemented a **Declarative Pipeline** using a `Jenkinsfile` located in the root of the repository. This ensures version control for the build process itself.
 
-### 2️⃣ The Verification
-1.  Access the site at `http://<EC2-IP>:3000`.
-2.  **Add a User:** Submit a name/email via the UI.
-3.  **Verify Persistence:** SSH into the DB container:
-    ```bash
-    sudo docker exec -it production-db bash
-    mysql -u root -p
-    USE myappdb;
-    SELECT * FROM users;
-    ```
+### 📜 The Pipeline Stages
+
+#### 1️⃣ Stage 1: Checkout SCM
+Jenkins listens for a **GitHub Webhook** trigger and immediately pulls the latest code from the `main` branch.
+
+#### 2️⃣ Stage 2: Build & Push (Docker)
+Jenkins builds the Docker images and pushes them to Docker Hub.
+> **Key Automation:** The frontend requires the backend's IP address to communicate. I used `ARG` injection in Docker to "bake" the **EC2 Public IP** (`NEXT_PUBLIC_API_URL`) into the React app during the build process.
+
+#### 3️⃣ Stage 3: Deploy to Production
+Jenkins connects to the Production App Server via SSH to execute the update:
+1. **Transfer Config:** Copies the latest `docker-compose.yml` to the server using `scp`.
+2. **Remote Deployment:** Executes shell commands remotely:
+   ```bash
+   sudo docker-compose down
+   sudo docker-compose pull   # Pulls the fresh images we just built
+   sudo docker-compose up -d  # Restarts containers with new code
